@@ -13,7 +13,7 @@ driver_agent = Agent(
     name="driver_agent",
     port=8001,
     seed="YOUR_COMMUNICATION_AGENT_SECRET_PHRASE",  # Replace with your unique secret phrase
-    endpoint=["http://<127.0.0.1>:8001/submit"]  # Update <127.0.0.1> with the server IP if needed
+    endpoint=["http://<127.0.0.1>:8001"]  # Update <127.0.0.1> with the server IP if needed
 )
 
 class TranscriptionMessage(Model):
@@ -60,7 +60,7 @@ def record_audio_wav(wav_path):
 
 async def send_transcription_message(address: str, transcription: str):
     print(f"Sending transcription to {address}: {transcription}")
-    await driver_agent.send(address, TranscriptionMessage(transcription=transcription))
+    await driver_agent.on_message(address, TranscriptionMessage(transcription=transcription))
 
 
 
@@ -85,11 +85,6 @@ def convert_m4a_to_wav(m4a_path, wav_path):
         return False
 
 async def transcribe_audio(wav_path):
-    # Check if the file exists
-    if not os.path.exists(wav_path):
-        print(f"Error: File '{wav_path}' does not exist. Ensure the conversion completed successfully.")
-        return
-
     print(f"Audio file '{wav_path}' found. Proceeding with transcription.")
     speech_client = speech.SpeechClient()
 
@@ -111,10 +106,12 @@ async def transcribe_audio(wav_path):
         transcription = [result.alternatives[0].transcript for result in response.results]
         transcribed_text = " ".join(transcription)
         
-        print("Transcription:", transcribed_text)
-        
-        # Send transcription to communication agent
-        await send_transcription_message(communication_agent_address, transcribed_text)
+        if not transcribed_text.strip():
+            print("Empty transcription. Triggering emergency.")
+            await send_transcription_message(communication_agent_address, "No response, possible emergency.")
+        else:
+            print("Transcription:", transcribed_text)
+            await send_transcription_message(communication_agent_address, transcribed_text)
         
     except Exception as e:
         print("Error during transcription:", e)

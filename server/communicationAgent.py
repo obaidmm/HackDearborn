@@ -7,10 +7,10 @@ communication_agent = Agent(
     name="communication_agent",
     port=8000,
     seed="YOUR_COMMUNICATION_AGENT_SECRET_PHRASE",  # Replace with your unique secret phrase
-    endpoint=["http://127.0.0.1:8000/submit"]  # Update <127.0.0.1> with the server IP if needed
+    endpoint=["http://127.0.0.1:8000"]  # Update <127.0.0.1> with the server IP if needed
 )
 
-communication_agent_address = "http://127.0.0.1:8000/submit"
+communication_agent_address = "http://127.0.0.1:8000"
 
 class Heartbeat(Model):
     message: str
@@ -32,9 +32,13 @@ async def receive_heartbeat(sender: str, msg: Heartbeat):
 
 @communication_agent.on_message(model=TranscriptionMessage)
 async def receive_transcription(sender: str, msg: TranscriptionMessage):
-    print("Attempting to send transcription message to communication agent")
     print(f"Transcription received from {sender}: {msg.transcription}")
-    # Process the transcription as needed, e.g., log it, analyze it, or respond
+    if "No response, possible emergency." in msg.transcription or not msg.transcription.strip():
+        print("No response or empty transcription. Triggering emergency.")
+        await trigger_emergency()
+    else:
+        # Process transcription, for example:
+        print(f"Communicating with driver: {msg.transcription}")
 
 async def monitor_heartbeat():
     global last_heartbeat
