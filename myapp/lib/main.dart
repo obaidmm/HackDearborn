@@ -28,7 +28,7 @@ class _MainPageState extends State<MainPage> {
   int index = 0;
   final screens = [
     HomePage(),
-    Report(),
+    DriveReportPage(),
   ];
 
   @override
