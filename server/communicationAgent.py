@@ -1,22 +1,74 @@
-from uagents import Agent, Context, Model
+from uagents import Agent, Model
+import asyncio
+import time
 
-bot_agent = Agent()
+# Define the Combined Communication Agent
+communication_agent = Agent(
+    name="communication_agent",
+    port=8000,
+    seed="YOUR_COMMUNICATION_AGENT_SECRET_PHRASE",  # Replace with your unique secret phrase
+    endpoint=["http://127.0.0.1:8000/submit"]  # Update <127.0.0.1> with the server IP if needed
+)
 
-class BotRequest(Model):
+communication_agent_address = "http://127.0.0.1:8000/submit"
+
+class Heartbeat(Model):
     message: str
 
-@bot_agent.on_message(model=BotRequest)
-async def handle_message(ctx: Context, sender: str, msg: BotRequest):
-    """Log the received message and reply to the sender"""
-    ctx.logger.info(f"Bot received message from {sender}: {msg.message}")
-    
-    if sender == 'agent1qggx6q8sqlkwxqupvp5h2sh9hjdnzucul9ef877gy73grud4603awnh8wpx':  # Driver's address
-        response_message = "Hello, Driver! How can I assist you today?"
-    else:
-        response_message = "Hello there! How may I help you?"
+class TranscriptionMessage(Model):
+    transcription: str
 
-    await ctx.send(sender, BotRequest(message=response_message))
-    ctx.logger.info(f"Message has been sent to {sender}")
+# Track the last heartbeat time
+last_heartbeat = time.time()
+HEARTBEAT_TIMEOUT = 120
+emergency_service_address = "fetch1g88yj3wtmjlzyqlwrwx7nl7fxknuzu9cf9wgrj"  # Update with actual address if necessary
+
+@communication_agent.on_message(model=Heartbeat)
+async def receive_heartbeat(sender: str, msg: Heartbeat):
+    print("Attempting to send transcription message to communication agent")
+    global last_heartbeat
+    last_heartbeat = time.time()
+    print(f"Heartbeat received from {sender}: {msg.message}")
+
+@communication_agent.on_message(model=TranscriptionMessage)
+async def receive_transcription(sender: str, msg: TranscriptionMessage):
+    print("Attempting to send transcription message to communication agent")
+    print(f"Transcription received from {sender}: {msg.transcription}")
+    # Process the transcription as needed, e.g., log it, analyze it, or respond
+
+async def monitor_heartbeat():
+    global last_heartbeat
+    try:
+        while True:
+            if time.time() - last_heartbeat > HEARTBEAT_TIMEOUT:
+                await trigger_emergency()
+            await asyncio.sleep(10)
+    except asyncio.CancelledError:
+        print("Heartbeat monitoring stopped.")
+
+async def trigger_emergency():
+    emergency_message = "Driver is unresponsive. Immediate assistance required."
+    print(emergency_message)
+    # Replace send_message with an existing or simulated function
+    await send_emergency_message(emergency_service_address, emergency_message)
+
+# Custom function to send messages (if send_message does not exist)
+async def send_emergency_message(address: str, message: str):
+    print(f"Sending emergency message to {address}: {message}")
+    # Implement actual sending logic if the library supports it, or simulate
+
+async def main():
+    # Run the agent's asynchronous loop
+    agent_task = asyncio.create_task(communication_agent.run_async())
+    try:
+        await asyncio.gather(agent_task, monitor_heartbeat())
+    except asyncio.CancelledError:
+        print("Communication agent shutting down.")
+        agent_task.cancel()
+        await agent_task
 
 if __name__ == "__main__":
-    bot_agent.run()
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("Program interrupted and stopped.")

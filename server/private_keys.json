@@ -1,0 +1,14 @@
+{
+    "bot_agent": {
+        "identity_key": "cca114b1156437694d5493c2e888410d8161e64e09fdfef84d36ddec62a6c722",
+        "wallet_key": "+TgdW8OIzAj5EbC+bRXu9LQ+Tvj34bzn3mDUxdoiNX0="
+    },
+    "emergency_agent": {
+        "identity_key": "166d4a474860eb14c8960b0837c15c30aef0fadb916944fcc2b40cda6c277a48",
+        "wallet_key": "4aIohzbZFib1fHnEamWLO90DHq70LR4skuUUHwtQhsQ="
+    },
+    "communication_agent": {
+        "identity_key": "8bebd72580047f4f43b9b93b420aebcc5f9ad3ac6a8a37ea7e2c7466b38df774",
+        "wallet_key": "ViBg0Wj0HEeJJQss/LJxLaxJC2ZCuLG4pAgIARPSphw="
+    }
+}
