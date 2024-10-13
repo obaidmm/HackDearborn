@@ -26,10 +26,10 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home Page'),
+        title: const Text('G.U.A.R.D. Home Page'),
       ),
       body: const Center(
-        child: Text('Welcome to the Home Page!'),
+        child: Text('Welcome to the G.U.A.R.D. Home Page!'),
       ),
     );
   }

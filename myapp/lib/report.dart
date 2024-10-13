@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Driving Report',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 255, 0, 0)),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       home: const DriveReportPage(),
@@ -29,7 +29,7 @@ class DriveReportPage extends StatelessWidget {
     final String startLocation = "123 Start St, City A";
     final String endLocation = "456 End Ave, City B";
     final double distanceDriven = 15.3; // example distance in miles
-    final double drivingScore = 92.5; // example score out of 100
+    final double drivingScore = 72.5; // example score out of 100
 
     // Determine color based on driving score
     Color getScoreColor(double score) {
@@ -37,6 +37,28 @@ class DriveReportPage extends StatelessWidget {
         return Colors.green;
       } else if (score >= 60) {
         return Colors.yellow;
+      } else {
+        return Colors.red;
+      }
+    }
+
+    // Determine message based on driving score
+    String getScoreMessage(double score) {
+      if (score >= 85) {
+        return 'Great job! Your driving habits are safe and efficient.';
+      } else if (score >= 60) {
+        return 'You’re doing okay, but try to improve your habits for safer driving.';
+      } else {
+        return 'Consider keeping a safer distance and braking gradually.';
+      }
+    }
+
+    // Determine message color based on driving score
+    Color getMessageColor(double score) {
+      if (score >= 85) {
+        return Colors.green;
+      } else if (score >= 60) {
+        return Colors.yellow[700]!;
       } else {
         return Colors.red;
       }
@@ -62,7 +84,7 @@ class DriveReportPage extends StatelessWidget {
                   offset: const Offset(0, 5),
                 ),
               ],
-              border: Border.all(color: const Color.fromARGB(255, 255, 0, 0), width: 2),
+              border: Border.all(color: Colors.deepPurple, width: 2),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,44 +112,40 @@ class DriveReportPage extends StatelessWidget {
                   'Distance Driven: ${distanceDriven.toStringAsFixed(1)} miles',
                   style: const TextStyle(fontSize: 18),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 40),
                 // Display driving score as a circular progress indicator
                 Center(
                   child: Column(
                     children: [
                       SizedBox(
-                        height: 150, // Increase the height of the circle
-                        width: 150,  // Increase the width of the circle
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            CircularProgressIndicator(
-                              value: drivingScore / 100, // percentage
-                              strokeWidth: 12.0, // Thicker stroke for a larger dial
-                              backgroundColor: Colors.grey[300],
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  getScoreColor(drivingScore)),
-                            ),
-                            Text(
-                              '${drivingScore.toStringAsFixed(1)}',
-                              style: const TextStyle(
-                                fontSize: 28, // Adjusted font size for clarity
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                        height: 100,
+                        width: 100,
+                        child: CircularProgressIndicator(
+                          value: drivingScore / 100, // percentage
+                          strokeWidth: 12.0,
+                          backgroundColor: Colors.grey[300],
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            getScoreColor(drivingScore),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20), // Add spacing between the circle and the text
+                      Text(
+                        '${drivingScore.toStringAsFixed(1)}',
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 10),
-                      drivingScore >= 85
-                          ? const Text(
-                              'Great job! Your driving habits are safe and efficient.',
-                              style: TextStyle(fontSize: 16, color: Colors.green),
-                            )
-                          : const Text(
-                              'Consider keeping a safer distance and braking gradually.',
-                              style: TextStyle(fontSize: 16, color: Colors.red),
-                            ),
+                      Text(
+                        getScoreMessage(drivingScore),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: getMessageColor(drivingScore),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ],
                   ),
                 ),
