@@ -43,12 +43,14 @@ class _MainPageState extends State<MainPage> {
             onDestinationSelected: (index) => setState(() => this.index = index),
             destinations: const [
               NavigationDestination(
-                icon: Icon(Icons.email_outlined),
-                label: 'Mail',
+                icon: Icon(Icons.location_on_outlined),
+                selectedIcon: Icon(Icons.location_on),
+                label: 'Location',
               ),
               NavigationDestination(
-                icon: Icon(Icons.chat_bubble_outline),
-                label: 'Chat',
+                icon: Icon(Icons.insert_drive_file_outlined),
+                selectedIcon: Icon(Icons.insert_drive_file),
+                label: 'Reports',
               ),
             ],
           ),
